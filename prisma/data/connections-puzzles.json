@@ -1,0 +1,215 @@
+{
+  "version": 1,
+  "puzzles": [
+    {
+      "externalId": "conn-001",
+      "title": "Warm up",
+      "difficulty": 0,
+      "groups": [
+        { "category": "Fruits", "difficulty": 0, "words": ["APPLE", "MANGO", "GRAPE", "PEACH"] },
+        { "category": "Planets", "difficulty": 1, "words": ["MARS", "VENUS", "EARTH", "SATURN"] },
+        { "category": "___ light", "difficulty": 2, "words": ["SUN", "MOON", "STAR", "FIRE"] },
+        {
+          "category": "NATO alphabet (start)",
+          "difficulty": 3,
+          "words": ["ALPHA", "BRAVO", "DELTA", "ECHO"]
+        }
+      ]
+    },
+    {
+      "externalId": "conn-002",
+      "title": "Everyday",
+      "difficulty": 0,
+      "groups": [
+        { "category": "Colors", "difficulty": 0, "words": ["RED", "BLUE", "GREEN", "YELLOW"] },
+        {
+          "category": "Chess pieces",
+          "difficulty": 1,
+          "words": ["KING", "QUEEN", "ROOK", "BISHOP"]
+        },
+        {
+          "category": "String instruments",
+          "difficulty": 2,
+          "words": ["VIOLIN", "CELLO", "HARP", "BASS"]
+        },
+        { "category": "Kitchen items", "difficulty": 3, "words": ["OVEN", "KNIFE", "SPOON", "PAN"] }
+      ]
+    },
+    {
+      "externalId": "conn-003",
+      "title": "Moving parts",
+      "difficulty": 1,
+      "groups": [
+        {
+          "category": "Dog breeds",
+          "difficulty": 0,
+          "words": ["BEAGLE", "POODLE", "BOXER", "HUSKY"]
+        },
+        {
+          "category": "Things with wheels",
+          "difficulty": 1,
+          "words": ["CAR", "BIKE", "SKATE", "CART"]
+        },
+        {
+          "category": "Units of time",
+          "difficulty": 2,
+          "words": ["MINUTE", "HOUR", "DAY", "YEAR"]
+        },
+        { "category": "___ ball", "difficulty": 3, "words": ["BASE", "FOOT", "BASKET", "TENNIS"] }
+      ]
+    },
+    {
+      "externalId": "conn-004",
+      "title": "Mixed bag",
+      "difficulty": 1,
+      "groups": [
+        {
+          "category": "Card suits",
+          "difficulty": 0,
+          "words": ["HEART", "SPADE", "CLUB", "DIAMOND"]
+        },
+        { "category": "Weather", "difficulty": 1, "words": ["RAIN", "SNOW", "SLEET", "HAIL"] },
+        { "category": "Emotions", "difficulty": 2, "words": ["HAPPY", "SAD", "ANGRY", "TIRED"] },
+        {
+          "category": "Programming languages",
+          "difficulty": 3,
+          "words": ["PYTHON", "JAVA", "RUBY", "RUST"]
+        }
+      ]
+    },
+    {
+      "externalId": "conn-005",
+      "title": "Desi flavour",
+      "difficulty": 1,
+      "groups": [
+        {
+          "category": "Indian cities",
+          "difficulty": 0,
+          "words": ["DELHI", "MUMBAI", "PUNE", "JAIPUR"]
+        },
+        {
+          "category": "Spices",
+          "difficulty": 1,
+          "words": ["CUMIN", "CLOVE", "GINGER", "CARDAMOM"]
+        },
+        {
+          "category": "Indian festivals",
+          "difficulty": 2,
+          "words": ["DIWALI", "HOLI", "EID", "ONAM"]
+        },
+        { "category": "Hindi numbers", "difficulty": 3, "words": ["EK", "DO", "TEEN", "CHAR"] }
+      ]
+    },
+    {
+      "externalId": "conn-006",
+      "title": "Natural",
+      "difficulty": 2,
+      "groups": [
+        {
+          "category": "Oceans",
+          "difficulty": 0,
+          "words": ["PACIFIC", "ATLANTIC", "INDIAN", "ARCTIC"]
+        },
+        { "category": "Gemstones", "difficulty": 1, "words": ["RUBY", "EMERALD", "TOPAZ", "OPAL"] },
+        { "category": "Trees", "difficulty": 2, "words": ["OAK", "MAPLE", "PINE", "BIRCH"] },
+        {
+          "category": "Greek letters",
+          "difficulty": 3,
+          "words": ["BETA", "GAMMA", "OMEGA", "THETA"]
+        }
+      ]
+    },
+    {
+      "externalId": "conn-007",
+      "title": "Morning routine",
+      "difficulty": 2,
+      "groups": [
+        {
+          "category": "Breakfast foods",
+          "difficulty": 0,
+          "words": ["PANCAKE", "WAFFLE", "CEREAL", "TOAST"]
+        },
+        {
+          "category": "Musical notation",
+          "difficulty": 1,
+          "words": ["NOTE", "SHARP", "FLAT", "CLEF"]
+        },
+        { "category": "Body parts", "difficulty": 2, "words": ["ELBOW", "KNEE", "ANKLE", "WRIST"] },
+        { "category": "In a wallet", "difficulty": 3, "words": ["CASH", "CARD", "COIN", "RECEIPT"] }
+      ]
+    },
+    {
+      "externalId": "conn-008",
+      "title": "Screen time",
+      "difficulty": 2,
+      "groups": [
+        {
+          "category": "Social platforms",
+          "difficulty": 0,
+          "words": ["TIKTOK", "INSTAGRAM", "FACEBOOK", "TWITTER"]
+        },
+        {
+          "category": "Search engines",
+          "difficulty": 1,
+          "words": ["GOOGLE", "BING", "YAHOO", "BAIDU"]
+        },
+        {
+          "category": "JS frameworks",
+          "difficulty": 2,
+          "words": ["REACT", "ANGULAR", "VUE", "SVELTE"]
+        },
+        {
+          "category": "Databases",
+          "difficulty": 3,
+          "words": ["MYSQL", "POSTGRES", "MONGO", "REDIS"]
+        }
+      ]
+    },
+    {
+      "externalId": "conn-009",
+      "title": "Game day",
+      "difficulty": 3,
+      "groups": [
+        {
+          "category": "Cricket terms",
+          "difficulty": 0,
+          "words": ["WICKET", "BATSMAN", "BOWLER", "UMPIRE"]
+        },
+        {
+          "category": "Football terms",
+          "difficulty": 1,
+          "words": ["GOAL", "OFFSIDE", "PENALTY", "KICKOFF"]
+        },
+        {
+          "category": "Tennis terms",
+          "difficulty": 2,
+          "words": ["SERVE", "ACE", "VOLLEY", "DEUCE"]
+        },
+        {
+          "category": "Chess terms",
+          "difficulty": 3,
+          "words": ["CHECK", "MATE", "GAMBIT", "CASTLE"]
+        }
+      ]
+    },
+    {
+      "externalId": "conn-010",
+      "title": "Color wheel",
+      "difficulty": 3,
+      "groups": [
+        {
+          "category": "Red things",
+          "difficulty": 0,
+          "words": ["TOMATO", "CHERRY", "ROSE", "BRICK"]
+        },
+        { "category": "Blue things", "difficulty": 1, "words": ["SKY", "OCEAN", "JEANS", "BERRY"] },
+        { "category": "Green things", "difficulty": 2, "words": ["GRASS", "LIME", "LEAF", "FROG"] },
+        {
+          "category": "Yellow things",
+          "difficulty": 3,
+          "words": ["LEMON", "BANANA", "SUNFLOWER", "CORN"]
+        }
+      ]
+    }
+  ]
+}

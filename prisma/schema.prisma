@@ -1,0 +1,258 @@
+// Extreme Wordle - Prisma schema
+// Docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ------------------------------- Enums -------------------------------
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum PuzzleSource {
+  AUTO
+  MANUAL
+}
+
+enum GameMode {
+  DAILY
+  UNLIMITED
+  INTERVAL
+}
+
+enum ConsentType {
+  ANALYTICS
+  MARKETING
+}
+
+// ------------------------------- Auth -------------------------------
+
+model User {
+  id           String    @id @default(cuid())
+  email        String    @unique
+  passwordHash String
+  name         String?
+  role         Role      @default(USER)
+  isBanned     Boolean   @default(false)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  lastLoginAt  DateTime?
+
+  sessions    Session[]
+  gameResults GameResult[]
+  auditLogs   AdminAuditLog[] @relation("AdminAuditLogs")
+  createdWords     DailyPuzzle[]  @relation("CreatedWords")
+  createdRotations PoolRotation[] @relation("CreatedRotations")
+  consents    ConsentRecord[]
+
+  @@index([role])
+  @@index([createdAt])
+}
+
+model Session {
+  id        String    @id @default(cuid())
+  userId    String
+  tokenHash String    @unique
+  ip        String?
+  userAgent String?
+  createdAt DateTime  @default(now())
+  expiresAt DateTime
+  revokedAt DateTime?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+}
+
+model GuestSession {
+  id                String   @id @default(cuid())
+  token             String   @unique
+  ip                String?
+  userAgent         String?
+  createdAt         DateTime @default(now())
+  lastSeenAt        DateTime @default(now())
+  convertedToUserId String?
+
+  gameResults GameResult[]
+  consents    ConsentRecord[]
+
+  @@index([createdAt])
+}
+
+// ------------------------------- Games -------------------------------
+
+model Game {
+  id          String   @id @default(cuid())
+  slug        String   @unique
+  name        String
+  tagline     String?
+  description String?
+  thumbnail   String?
+  category    String   @default("word")
+  isActive    Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  settings    Json     @default("{}")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  wordEntries  WordEntry[]
+  puzzles      GamePuzzle[]
+  dailyPuzzles DailyPuzzle[]
+  rotations    PoolRotation[]
+  gameResults  GameResult[]
+
+  @@index([isActive, sortOrder])
+}
+
+model WordEntry {
+  id           String   @id @default(cuid())
+  gameId       String
+  word         String
+  normalized   String
+  length       Int?
+  difficulty   Int?
+  isAnswerPool Boolean  @default(true)
+  isActive     Boolean  @default(true)
+  tags         String[] @default([])
+  createdAt    DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, normalized])
+  @@index([gameId, isAnswerPool, isActive])
+}
+
+// Structured puzzles (Connections groups, Spelling Bee letter sets, ...).
+// `externalId` is the stable token stored on DailyPuzzle.word.
+model GamePuzzle {
+  id         String   @id @default(cuid())
+  gameId     String
+  externalId String
+  title      String?
+  difficulty Int      @default(0)
+  payload    Json
+  isActive   Boolean  @default(true)
+  createdAt  DateTime @default(now())
+
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([gameId, externalId])
+  @@index([gameId, isActive, difficulty])
+}
+
+model PoolRotation {
+  id               String       @id @default(cuid())
+  gameId           String
+  bucketKey        String
+  seed             String
+  source           PuzzleSource @default(AUTO)
+  createdByAdminId String?
+  createdAt        DateTime     @default(now())
+
+  game     Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  admin    User? @relation("CreatedRotations", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+
+  @@unique([gameId, bucketKey])
+  @@index([bucketKey])
+}
+
+model DailyPuzzle {
+  id               String       @id @default(cuid())
+  gameId           String
+  bucketKey        String
+  word             String
+  normalized       String
+  source           PuzzleSource @default(AUTO)
+  createdByAdminId String?
+  publishedAt      DateTime     @default(now())
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+
+  game  Game  @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  admin User? @relation("CreatedWords", fields: [createdByAdminId], references: [id], onDelete: SetNull)
+
+  gameResults GameResult[]
+
+  @@unique([gameId, bucketKey])
+  @@index([bucketKey])
+  @@index([gameId, publishedAt])
+}
+
+model GameResult {
+  id          String    @id @default(cuid())
+  gameId      String
+  userId      String?
+  guestId     String?
+  puzzleId    String?
+  mode        GameMode  @default(DAILY)
+  bucketKey   String?
+  answer      String?
+  guesses     Json      @default("[]")
+  solved      Boolean   @default(false)
+  attempts    Int       @default(0)
+  durationMs  Int?
+  startedAt   DateTime  @default(now())
+  completedAt DateTime?
+  createdAt   DateTime  @default(now())
+
+  game   Game         @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user   User?        @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guest  GuestSession? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  puzzle DailyPuzzle? @relation(fields: [puzzleId], references: [id], onDelete: SetNull)
+
+  @@index([gameId, createdAt])
+  @@index([userId, gameId])
+  @@index([guestId, gameId])
+  @@index([mode, bucketKey])
+}
+
+// ------------------------------- Admin / Ops -------------------------------
+
+model AdminAuditLog {
+  id         String   @id @default(cuid())
+  adminId    String?
+  action     String
+  targetType String?
+  targetId   String?
+  meta       Json     @default("{}")
+  ip         String?
+  createdAt  DateTime @default(now())
+
+  admin User? @relation("AdminAuditLogs", fields: [adminId], references: [id], onDelete: SetNull)
+
+  @@index([adminId, createdAt])
+  @@index([action])
+  @@index([targetType, targetId])
+}
+
+model ConsentRecord {
+  id         String      @id @default(cuid())
+  userId     String?
+  guestId    String?
+  type       ConsentType
+  granted    Boolean     @default(true)
+  version    String      @default("1")
+  createdAt  DateTime    @default(now())
+
+  user  User?         @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guest GuestSession? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([guestId])
+}
+
+model SiteSetting {
+  key       String   @id
+  value     Json
+  updatedAt DateTime @updatedAt
+  updatedBy String?
+}
