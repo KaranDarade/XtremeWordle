@@ -182,6 +182,105 @@ flowchart LR
   Cron --> API
 ```
 
+### Detailed architecture
+
+Every layer, module and integration:
+
+```mermaid
+flowchart TB
+  subgraph Client["Client — browser"]
+    direction TB
+    C1["Route groups<br/>(site) · admin · api"]
+    C2["Components<br/>ui · games · arena · admin<br/>profile · auth · avatar · brand · theme"]
+    C3["Adaptive polling<br/>+ presence heartbeat"]
+    C4["Cookie consent"]
+  end
+
+  subgraph Edge["Vercel edge"]
+    E1["proxy.ts<br/>guest cookie · /admin guard"]
+    E2["Security headers"]
+    E3["Static + CDN<br/>icons · images · RSC payloads"]
+  end
+
+  subgraph Server["Next.js 16 serverless — Node, sin1"]
+    direction TB
+    S1["Server Components<br/>+ Server Actions"]
+    subgraph Routes["Route Handlers /api/*"]
+      R1["games/*"]
+      R2["arena/*"]
+      R3["auth/google/*"]
+      R4["cron/*"]
+      R5["health · presence"]
+    end
+    subgraph Domain["Domain libraries (src/lib)"]
+      D1["games<br/>wordle · bee · connections"]
+      D2["arena<br/>clock · engine · bot · cleanup · view · replay"]
+      D3["words<br/>resolver · rotation · feedback"]
+      D4["auth<br/>dal · session · otp · password-reset · google"]
+      D5["mail<br/>console · file · resend · smtp"]
+      D6["captcha/turnstile"]
+      D7["http<br/>guard · origin · rate-limit"]
+    end
+    S3["Prisma 7 client<br/>@prisma/adapter-pg"]
+  end
+
+  subgraph Data["Neon PostgreSQL 18"]
+    PG[("User · Session · GuestSession · Game · WordEntry · GamePuzzle<br/>DailyPuzzle · PoolRotation · GameResult · ArenaMatch · ArenaPlayer<br/>ArenaGuess · ArenaReaction · ArenaQueue · PasswordResetOtp<br/>ConsentRecord · SiteSetting · AdminAuditLog · Presence")]
+  end
+
+  subgraph External["External services"]
+    X1["Google OAuth 2.0 (PKCE)"]
+    X2["Cloudflare Turnstile"]
+    X3["Resend · Gmail SMTP"]
+  end
+
+  subgraph Sched["Schedulers"]
+    SC1["Vercel Cron<br/>rotate-words 00:00 · cleanup 03:00 UTC"]
+    SC2["GitHub Actions<br/>12h rotate · 30m uptime"]
+  end
+
+  C1 --> E1 --> S1
+  C2 --> S1
+  C3 --> R2
+  C4 --> Client
+  S1 --> D1
+  S1 --> D4
+  Routes --> D1
+  Routes --> D2
+  Routes --> D4
+  R2 --> D2
+  R4 --> D3
+  D1 --> S3
+  D2 --> S3
+  D3 --> S3
+  D4 --> S3
+  S3 --> PG
+  D4 <--> X1
+  D6 <--> X2
+  D5 --> X3
+  SC1 --> R4
+  SC2 --> R4
+  E1 --- E2
+  E3 --- Client
+```
+
+### Deployment & CI pipeline
+
+How code goes from your machine to production, and how the scheduled jobs feed back in:
+
+```mermaid
+flowchart LR
+  Dev["Local dev<br/>npm run verify"] -->|git push| GH["GitHub · main"]
+  Dev -->|vercel deploy --prod| Prod["Vercel production<br/>xtreme-wordle.vercel.app · sin1"]
+  GH -->|Git integration| Build["Vercel build<br/>npm install → prisma generate → next build"]
+  Build --> Prod
+  GH -->|scheduled| GHA["GitHub Actions<br/>rotate-words · uptime"]
+  VercelCron["Vercel Cron"] --> Prod
+  GHA --> Prod
+  Prod --> PDB[("Neon PostgreSQL")]
+  Prod --> PExt["Google · Turnstile<br/>Resend / SMTP"]
+```
+
 **Request lifecycle.** `proxy.ts` (Next 16's renamed middleware) runs on every non-asset request to
 issue the anonymous guest cookie and optimistically redirect unauthenticated `/admin` visits. Real
 authorisation happens in the Data Access Layer (`src/lib/auth/dal.ts`). Pages render as Server
