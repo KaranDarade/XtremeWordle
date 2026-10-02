@@ -12,7 +12,7 @@ export function GamesJsonLd({ games }: { games: PublicGame[] }) {
     "@graph": [
       {
         "@type": "WebSite",
-        name: "Bubble Wordle",
+        name: "Wordle Arena",
         url: base,
         description:
           "Daily word games in one place, including Wordle, Spelling Bee and Connections.",

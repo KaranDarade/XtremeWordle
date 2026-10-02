@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Wordle Arena">
+  <defs>
+    <linearGradient id="tile" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#e7bd7d" />
+      <stop offset="1" stop-color="#c98f43" />
+    </linearGradient>
+    <linearGradient id="sheen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff8ec" stop-opacity="0.55" />
+      <stop offset="1" stop-color="#fff8ec" stop-opacity="0" />
+    </linearGradient>
+    <clipPath id="tile-clip">
+      <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" />
+    </clipPath>
+  </defs>
+
+  <rect x="0.5" y="0.5" width="31" height="31" rx="7.5" fill="url(#tile)" />
+  <rect x="0.5" y="0.5" width="31" height="15" fill="url(#sheen)" clip-path="url(#tile-clip)" />
+  <rect
+    x="0.5"
+    y="0.5"
+    width="31"
+    height="31"
+    rx="7.5"
+    fill="none"
+    stroke="#8a5a2b"
+    stroke-opacity="0.55"
+    stroke-width="1"
+  />
+  <path
+    d="M8.2 10.4 L12.1 21.6 L16 12.8 L19.9 21.6 L23.8 10.4"
+    fill="none"
+    stroke="#241809"
+    stroke-width="3.2"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>

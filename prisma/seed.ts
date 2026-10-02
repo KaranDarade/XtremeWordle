@@ -5,10 +5,12 @@ import path from "node:path";
 import bcrypt from "bcryptjs";
 
 import { PrismaClient, Prisma, Role } from "../src/generated/prisma/client";
+import { ARENA_DEFAULTS, ARENA_POINTS, LEAGUE_THRESHOLDS } from "../src/lib/arena/config";
 import { DEMO_USERS, GAME_CATALOG } from "../src/lib/games/catalog";
 import { createPrismaClient } from "../src/lib/prisma";
 
 const prisma: PrismaClient = createPrismaClient();
+const ADMIN_USERNAME = "arena-admin";
 
 interface ConnectionsGroup {
   category: string;
@@ -105,18 +107,19 @@ function buildLetterSets(dictionary: string[], limit = 200) {
 }
 
 async function main() {
-  console.log("Seeding Bubble Wordle...");
+  console.log("Seeding Wordle Arena...");
 
   // --- Admin + demo users ---
   const adminEmail = process.env.ADMIN_EMAIL ?? "admin@extremewordle.local";
   const adminPassword = process.env.ADMIN_PASSWORD ?? "Admin@12345";
-  const adminName = process.env.ADMIN_NAME ?? "Bubble Admin";
+  const adminName = process.env.ADMIN_NAME ?? "Arena Admin";
 
   await prisma.user.upsert({
     where: { email: adminEmail },
-    update: { name: adminName, role: Role.ADMIN, isBanned: false },
+    update: { name: adminName, username: ADMIN_USERNAME, role: Role.ADMIN, isBanned: false },
     create: {
       email: adminEmail,
+      username: ADMIN_USERNAME,
       name: adminName,
       passwordHash: await bcrypt.hash(adminPassword, BCRYPT_ROUNDS),
       role: Role.ADMIN,
@@ -124,19 +127,26 @@ async function main() {
   });
   console.log(`  admin: ${adminEmail}`);
 
-  for (const demo of DEMO_USERS) {
-    await prisma.user.upsert({
-      where: { email: demo.email },
-      update: {},
-      create: {
-        email: demo.email,
-        name: demo.name,
-        passwordHash: await bcrypt.hash(demo.password, BCRYPT_ROUNDS),
-        role: Role.USER,
-      },
-    });
+  // Demo accounts have a well-known password, so they are opt-in only. They
+  // must never be created on a production database by accident.
+  if (process.env.SEED_DEMO_USERS === "1") {
+    for (const demo of DEMO_USERS) {
+      await prisma.user.upsert({
+        where: { email: demo.email },
+        update: { username: demo.username },
+        create: {
+          email: demo.email,
+          username: demo.username,
+          name: demo.name,
+          passwordHash: await bcrypt.hash(demo.password, BCRYPT_ROUNDS),
+          role: Role.USER,
+        },
+      });
+    }
+    console.log(`  demo users: ${DEMO_USERS.length}`);
+  } else {
+    console.log("  demo users: skipped (set SEED_DEMO_USERS=1 to create)");
   }
-  console.log(`  demo users: ${DEMO_USERS.length}`);
 
   // --- Games ---
   const games = new Map<string, string>();
@@ -236,6 +246,30 @@ async function main() {
     });
   }
   console.log(`  connections: ${connections.puzzles.length} puzzles`);
+
+  // --- Arena configuration (single source of truth for the engine + admin UI) ---
+  const arenaSettings: { key: string; value: Prisma.InputJsonValue }[] = [
+    { key: "arena.leagues", value: LEAGUE_THRESHOLDS as unknown as Prisma.InputJsonValue },
+    { key: "arena.points", value: ARENA_POINTS as unknown as Prisma.InputJsonValue },
+    {
+      key: "arena.timings",
+      value: {
+        roundMs: ARENA_DEFAULTS.roundMs,
+        breakMs: ARENA_DEFAULTS.breakMs,
+        countdownMs: ARENA_DEFAULTS.countdownMs,
+        roundCount: ARENA_DEFAULTS.roundCount,
+      },
+    },
+  ];
+
+  for (const setting of arenaSettings) {
+    await prisma.siteSetting.upsert({
+      where: { key: setting.key },
+      update: { value: setting.value },
+      create: { key: setting.key, value: setting.value },
+    });
+  }
+  console.log(`  arena settings: ${arenaSettings.length}`);
 
   console.log("Seed complete.");
 }

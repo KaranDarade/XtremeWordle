@@ -6,5 +6,6 @@ coverage
 playwright-report
 test-results
 src/generated
+docs
 package-lock.json
 *.tsbuildinfo

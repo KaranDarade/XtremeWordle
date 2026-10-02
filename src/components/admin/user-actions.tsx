@@ -19,7 +19,14 @@ export function UserActions({
   isBanned: boolean;
   isSelf: boolean;
 }) {
-  const [state, formAction, pending] = useActionState(resetUserPasswordAction, IDLE_ADMIN_STATE);
+  const [resetState, resetAction, resetPending] = useActionState(
+    resetUserPasswordAction,
+    IDLE_ADMIN_STATE,
+  );
+  const [revokeState, revokeAction, revokePending] = useActionState(
+    revokeSessionsAction,
+    IDLE_ADMIN_STATE,
+  );
 
   return (
     <div className="space-y-6">
@@ -36,22 +43,26 @@ export function UserActions({
           </button>
         </form>
 
-        <form action={revokeSessionsAction}>
+        <form action={revokeAction}>
           <input type="hidden" name="userId" value={userId} />
           <button
             type="submit"
-            className="glass rounded-xl px-3.5 py-2 text-sm font-semibold transition hover:opacity-90"
+            disabled={revokePending}
+            data-testid="revoke-sessions"
+            className="glass rounded-xl px-3.5 py-2 text-sm font-semibold transition hover:opacity-90 disabled:opacity-50"
           >
-            Revoke all sessions
+            {revokePending ? "Revoking…" : "Revoke all sessions"}
           </button>
         </form>
       </div>
+
+      <Notice status={revokeState.status} message={revokeState.message} testId="revoke-notice" />
 
       {isSelf ? (
         <p className="text-xs text-muted">You cannot ban or lock out your own account.</p>
       ) : null}
 
-      <form action={formAction} className="space-y-3">
+      <form action={resetAction} className="space-y-3">
         <input type="hidden" name="userId" value={userId} />
         <Field
           label="Reset password"
@@ -67,9 +78,9 @@ export function UserActions({
             required
           />
         </Field>
-        <Notice status={state.status} message={state.message} />
-        <SubmitButton pending={pending} className="sm:w-auto">
-          {pending ? "Resetting…" : "Reset password"}
+        <Notice status={resetState.status} message={resetState.message} testId="user-notice" />
+        <SubmitButton pending={resetPending} className="sm:w-auto">
+          {resetPending ? "Resetting…" : "Reset password"}
         </SubmitButton>
       </form>
     </div>

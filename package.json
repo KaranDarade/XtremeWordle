@@ -1,14 +1,15 @@
 {
-  "name": "bubble-wordle",
+  "name": "wordle-arena",
   "version": "0.1.0",
   "private": true,
   "engines": {
-    "node": ">=20.9.0"
+    "node": "22.x"
   },
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "postinstall": "prisma generate",
     "lint": "eslint",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write .",
@@ -16,15 +17,18 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "test:e2e": "playwright test",
+    "test:e2e": "playwright test --grep-invert @heavy",
+    "test:e2e:full": "playwright test",
     "verify": "npm run lint && npm run typecheck && npm run test",
-    "verify:full": "npm run verify && npm run test:e2e",
+    "verify:full": "npm run verify && npm run test:e2e:full",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
     "db:seed": "prisma db seed",
     "db:reset": "prisma migrate reset",
-    "db:studio": "prisma studio"
+    "db:studio": "prisma studio",
+    "icons": "node scripts/generate-icons.mjs",
+    "loadtest": "node scripts/loadtest.mjs"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",

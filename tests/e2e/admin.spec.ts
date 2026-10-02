@@ -47,7 +47,7 @@ test.describe("admin access control", () => {
   });
 });
 
-test.describe("admin dashboard", () => {
+test.describe("@heavy admin dashboard", () => {
   test.beforeEach(async ({ page }) => {
     await adminLogin(page);
   });
@@ -83,7 +83,7 @@ test.describe("admin dashboard", () => {
     await page.locator('input[name="date"]').fill(date);
     await page.getByTestId("schedule-submit").click();
 
-    await expect(page.getByTestId("admin-notice")).toContainText("crane");
+    await expect(page.getByTestId("schedule-form-notice")).toContainText("crane");
 
     const row = page.getByTestId(`schedule-row-${date}`);
     await expect(row).toContainText("crane");
@@ -96,19 +96,24 @@ test.describe("admin dashboard", () => {
     await page.locator('input[name="date"]').fill(istDate(5));
     await page.getByTestId("schedule-submit").click();
 
-    await expect(page.getByTestId("admin-notice")).toContainText("not in this game");
+    await expect(page.getByTestId("schedule-form-notice")).toContainText("not in this game");
   });
 
   test("imports words and finds them in the list", async ({ page }) => {
     const unique = `qz${Date.now().toString(36).replace(/[0-9]/g, "x")}`;
 
     await page.goto("/admin/words");
+
+    // The dashboard streams a loading fallback, so wait for the page to settle
+    // (the streamed placeholder briefly duplicates content).
+    await expect(page.getByTestId("import-csv")).toHaveCount(1);
+
     await page.getByTestId("import-csv").fill(`alpha\n${unique}\nbeta`);
     await page.getByTestId("import-submit").click();
-    await expect(page.getByTestId("admin-notice")).toContainText("Imported");
+    await expect(page.getByTestId("import-notice")).toContainText("Imported");
 
     await page.goto(`/admin/words?game=wordle&q=${unique}`);
-    await expect(page.getByText(unique, { exact: true })).toBeVisible();
+    await expect(page.getByText(unique, { exact: true })).toHaveCount(1);
   });
 
   test("shows the audit log with recorded admin actions", async ({ page }) => {

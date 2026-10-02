@@ -96,7 +96,7 @@ describe("shareText", () => {
       { word: "crane", feedback: ["absent", "present", "absent", "absent", "absent"] },
       { word: "brave", feedback: ["correct", "correct", "correct", "correct", "correct"] },
     ];
-    const text = shareText("Bubble Wordle #2026-09-15", rows, 6);
+    const text = shareText("Wordle Arena #2026-09-15", rows, 6);
     expect(text).toContain("2/6");
     expect(text).toContain("⬜🟨⬜⬜⬜");
     expect(text).toContain("🟩🟩🟩🟩🟩");
@@ -107,6 +107,6 @@ describe("shareText", () => {
     const rows: GuessRow[] = [
       { word: "crane", feedback: ["absent", "absent", "absent", "absent", "absent"] },
     ];
-    expect(shareText("Bubble Wordle", rows, 6)).toContain("X/6");
+    expect(shareText("Wordle Arena", rows, 6)).toContain("X/6");
   });
 });

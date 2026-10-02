@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Terms of use",
-  description: "The rules for using Bubble Wordle.",
+  description: "The rules for using Wordle Arena.",
 };
 
 export default function TermsPage() {
@@ -16,7 +16,7 @@ export default function TermsPage() {
           <section>
             <h2 className="text-base font-semibold text-foreground">Using the service</h2>
             <p>
-              Bubble Wordle is provided free of charge for personal entertainment. You may play as a
+              Wordle Arena is provided free of charge for personal entertainment. You may play as a
               guest or create an account. Do not attempt to disrupt the service or access accounts
               that are not yours.
             </p>

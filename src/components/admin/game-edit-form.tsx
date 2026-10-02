@@ -46,7 +46,7 @@ export function GameEditForm({
         <TextArea id={`desc-${game.id}`} name="description" defaultValue={game.description ?? ""} />
       </Field>
 
-      <Notice status={state.status} message={state.message} />
+      <Notice status={state.status} message={state.message} testId={`game-notice-${game.id}`} />
 
       <SubmitButton pending={pending} className="sm:w-auto" data-testid={`save-game-${game.id}`}>
         {pending ? "Saving…" : "Save game"}

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 
+import { cleanupArena } from "@/lib/arena/cleanup";
 import { extractCronToken, isCronAuthorized } from "@/lib/cron/auth";
 import { rotateAllGames } from "@/lib/words/rotation";
 
@@ -24,7 +25,8 @@ async function handle(request: Request) {
 
   try {
     const results = await rotateAllGames();
-    return NextResponse.json({ ok: true, ranAt, results });
+    const cleanup = await cleanupArena();
+    return NextResponse.json({ ok: true, ranAt, results, cleanup });
   } catch (error) {
     console.error("[cron] rotation failed", error);
     return NextResponse.json({ ok: false, error: "Rotation failed" }, { status: 500 });

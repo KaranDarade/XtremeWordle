@@ -10,8 +10,16 @@ function baseUrl(): string {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const base = baseUrl();
-  const games = await getPublicGames();
   const now = new Date();
+
+  // The sitemap is statically generated at build time; if the database is
+  // briefly unreachable we fall back to the static URLs rather than failing.
+  let games: Awaited<ReturnType<typeof getPublicGames>> = [];
+  try {
+    games = await getPublicGames();
+  } catch {
+    games = [];
+  }
 
   return [
     { url: `${base}/`, lastModified: now, changeFrequency: "daily", priority: 1 },

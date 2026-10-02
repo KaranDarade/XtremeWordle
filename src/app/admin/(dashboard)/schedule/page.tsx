@@ -82,7 +82,7 @@ export default async function AdminSchedulePage({
           Manual words always win over automatic rotation for that slot.
         </p>
         {wordGames.length > 0 ? (
-          <ScheduleForm games={wordGames} defaultDate={defaultDate} />
+          <ScheduleForm games={wordGames} defaultDate={defaultDate} defaultMode={mode} />
         ) : (
           <p className="text-sm text-muted">
             Manual assignment is only available for word-list games. Use &ldquo;Force new&rdquo;

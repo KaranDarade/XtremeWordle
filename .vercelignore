@@ -1,0 +1,22 @@
+# Files Vercel does not need for the build/runtime.
+# `.env*` is already gitignored; listing it here guarantees no secret upload.
+.env
+.env.*
+!.env.example
+
+# Never ship generated artifacts (rebuilt by `postinstall` -> `prisma generate`).
+src/generated
+
+# Test + docs + local tooling output.
+tests
+docs
+playwright-report
+test-results
+.blob-report
+coverage
+
+# Local dev leftovers.
+.mail-outbox.log
+*.tsbuildinfo
+.eslintcache
+tsconfig.tsbuildinfo

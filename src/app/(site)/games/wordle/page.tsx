@@ -10,7 +10,7 @@ import { getIdentity, hasIdentity } from "@/lib/session/identity";
 export const metadata: Metadata = {
   title: "Wordle",
   description:
-    "Guess the hidden five-letter word in six tries. Play the daily Bubble Wordle puzzle or unlimited mode — free, no account required.",
+    "Guess the hidden five-letter word in six tries. Play the daily Wordle Arena puzzle or unlimited mode — free, no account required.",
 };
 
 export default async function WordlePage() {

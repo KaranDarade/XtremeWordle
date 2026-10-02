@@ -44,7 +44,7 @@ export function ImportWordsForm({ games }: { games: { id: string; name: string }
         />
       </Field>
 
-      <Notice status={state.status} message={state.message} />
+      <Notice status={state.status} message={state.message} testId="import-notice" />
 
       <SubmitButton pending={pending} data-testid="import-submit" className="sm:w-auto">
         {pending ? "Importing…" : "Import words"}

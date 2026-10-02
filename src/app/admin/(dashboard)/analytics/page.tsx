@@ -66,16 +66,29 @@ export default async function AdminAnalyticsPage({
 
       <section className="glass rounded-2xl p-5">
         <h2 className="font-semibold">Plays in the last 14 days</h2>
-        <div className="mt-4 flex h-40 items-end gap-1.5">
-          {data.series.map((point) => (
-            <div key={point.date} className="group flex flex-1 flex-col items-center gap-1">
+        <div className="mt-4 flex h-40 items-end gap-1.5" data-testid="analytics-series">
+          {data.series.map((point) => {
+            // A percentage height only resolves against a parent with a definite
+            // height, so each column is h-full and bars are floored at 4% when
+            // there is activity (otherwise a small day is invisible).
+            const ratio = point.plays / maxSeries;
+            const height = point.plays === 0 ? 0 : Math.max(4, Math.round(ratio * 100));
+
+            return (
               <div
-                className="w-full rounded-t bg-primary/70 transition group-hover:bg-primary"
-                style={{ height: `${Math.round((point.plays / maxSeries) * 100)}%` }}
+                key={point.date}
+                className="group flex h-full flex-1 flex-col justify-end"
                 title={`${point.date}: ${point.plays} plays, ${point.solved} solved`}
-              />
-            </div>
-          ))}
+              >
+                <div
+                  data-testid="analytics-bar"
+                  data-plays={point.plays}
+                  className="w-full rounded-t bg-primary/70 transition group-hover:bg-primary"
+                  style={{ height: `${height}%` }}
+                />
+              </div>
+            );
+          })}
         </div>
         <div className="mt-2 flex justify-between text-[10px] text-muted">
           <span>{data.series[0]?.date}</span>

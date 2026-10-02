@@ -49,7 +49,7 @@ beforeAll(async () => {
   guestSessionId = guest.id;
 
   const user = await prisma.user.create({
-    data: { email: `${slug}@example.com`, passwordHash: "x" },
+    data: { email: `${slug}@example.com`, username: slug, passwordHash: "x" },
   });
   userId = user.id;
 

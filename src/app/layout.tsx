@@ -17,23 +17,23 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Bubble Wordle — Daily word games",
-    template: "%s · Bubble Wordle",
+    default: "Wordle Arena — Daily word games",
+    template: "%s · Wordle Arena",
   },
   description:
-    "Play Bubble Wordle plus a growing collection of daily word games. New puzzles every day, free and no account required.",
-  applicationName: "Bubble Wordle",
+    "Play Wordle Arena plus a growing collection of daily word games. New puzzles every day, free and no account required.",
+  applicationName: "Wordle Arena",
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   openGraph: {
     type: "website",
-    siteName: "Bubble Wordle",
-    title: "Bubble Wordle — Daily word games",
+    siteName: "Wordle Arena",
+    title: "Wordle Arena — Daily word games",
     description:
       "Daily word puzzles in one place. A fresh challenge every midnight IST, free and playable without an account.",
   },
   twitter: {
     card: "summary_large_image",
-    title: "Bubble Wordle — Daily word games",
+    title: "Wordle Arena — Daily word games",
     description: "Daily word puzzles in one place. Free, no account required.",
   },
 };

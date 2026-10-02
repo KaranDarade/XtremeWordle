@@ -9,12 +9,14 @@ import { IDLE_ADMIN_STATE } from "@/lib/admin/types";
 export function ScheduleForm({
   games,
   defaultDate,
+  defaultMode = "daily",
 }: {
   games: { slug: string; name: string }[];
   defaultDate: string;
+  defaultMode?: "daily" | "twelve-hour";
 }) {
   const [state, formAction, pending] = useActionState(assignWordAction, IDLE_ADMIN_STATE);
-  const [mode, setMode] = useState<"daily" | "twelve-hour">("daily");
+  const [mode, setMode] = useState<"daily" | "twelve-hour">(defaultMode);
 
   return (
     <form action={formAction} className="space-y-4">
@@ -68,7 +70,7 @@ export function ScheduleForm({
         </Field>
       </div>
 
-      <Notice status={state.status} message={state.message} />
+      <Notice status={state.status} message={state.message} testId="schedule-form-notice" />
 
       <SubmitButton pending={pending} data-testid="schedule-submit" className="sm:w-auto">
         {pending ? "Saving…" : "Assign word"}

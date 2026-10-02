@@ -66,6 +66,13 @@ export async function adminLoginAction(
     values,
   };
   if (!user) return invalid;
+  if (!user.passwordHash) {
+    return {
+      status: "error",
+      message: "This account uses Google sign-in and has no password.",
+      values,
+    };
+  }
 
   const matches = await verifyPassword(parsed.data.password, user.passwordHash);
   if (!matches) return invalid;
@@ -299,10 +306,16 @@ export async function resetUserPasswordAction(
   return { status: "success", message: "Password reset and all sessions revoked." };
 }
 
-export async function revokeSessionsAction(formData: FormData): Promise<void> {
+export async function revokeSessionsAction(
+  _prevState: AdminActionState,
+  formData: FormData,
+): Promise<AdminActionState> {
   const admin = await requireAdmin();
   const userId = String(formData.get("userId") ?? "");
-  if (!userId) return;
+  if (!userId) return { status: "error", message: "User not found." };
+
+  const user = await prisma.user.findUnique({ where: { id: userId }, select: { email: true } });
+  if (!user) return { status: "error", message: "User not found." };
 
   await revokeAllSessions(userId);
   await logAdminAction({
@@ -310,8 +323,10 @@ export async function revokeSessionsAction(formData: FormData): Promise<void> {
     action: "user.revokeSessions",
     targetType: "User",
     targetId: userId,
+    meta: { email: user.email },
   });
   revalidateAdmin();
+  return { status: "success", message: "Every session for this user has been revoked." };
 }
 
 // ------------------------------- Words: CSV import -------------------------------

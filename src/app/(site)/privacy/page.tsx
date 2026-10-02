@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Privacy policy",
-  description: "How Bubble Wordle handles your data, cookies and sessions.",
+  description: "How Wordle Arena handles your data, cookies and sessions.",
 };
 
 export default function PrivacyPolicyPage() {

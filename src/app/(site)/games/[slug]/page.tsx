@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { ArrowLeft, CalendarClock, Gamepad2, Sparkles } from "lucide-react";
+import { ArrowLeft, CalendarClock, Gamepad2, Sparkles, Swords } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -19,7 +19,7 @@ export async function generateMetadata({
 
   return {
     title: game.name,
-    description: game.description ?? game.tagline ?? `Play ${game.name} on Bubble Wordle.`,
+    description: game.description ?? game.tagline ?? `Play ${game.name} on Wordle Arena.`,
   };
 }
 
@@ -74,12 +74,19 @@ export default async function GameDetailPage({ params }: { params: Promise<{ slu
       </header>
 
       <GlassCard className="mt-6 p-6 text-center">
-        <p className="text-sm font-semibold">This game is being wired up.</p>
+        <p className="text-sm font-semibold">Not playable yet</p>
         <p className="mt-1 text-sm text-muted">
-          The board for {game.name} arrives in the next build step. The daily word for{" "}
-          <span className="font-mono text-xs">{dailyBucketKey()}</span> is already scheduled and
-          waiting.
+          {game.name} is published in the catalogue but its board has not shipped yet. The daily
+          word for <span className="font-mono text-xs">{dailyBucketKey()}</span> is already
+          scheduled and waiting.
         </p>
+        <Link
+          href="/arena"
+          className="btn-primary mt-4 inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold"
+        >
+          <Swords className="size-4" />
+          Play the Arena instead
+        </Link>
       </GlassCard>
 
       {allGames.length > 1 ? (

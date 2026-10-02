@@ -62,7 +62,7 @@ const EMOJI: Record<LetterFeedback, string> = {
   absent: "⬜",
 };
 
-/** Spoiler-free share text, e.g. `Bubble Wordle #2026-09-15 3/6`. */
+/** Spoiler-free share text, e.g. `Wordle Arena #2026-09-15 3/6`. */
 export function shareText(title: string, rows: GuessRow[], maxAttempts: number): string {
   const solved = rows.some((row) => row.feedback.every((value) => value === "correct"));
   const score = solved ? `${rows.length}/${maxAttempts}` : `X/${maxAttempts}`;

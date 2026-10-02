@@ -3,6 +3,7 @@
 import {
   BarChart3,
   CalendarClock,
+  Swords,
   ExternalLink,
   Gamepad2,
   LayoutDashboard,
@@ -13,13 +14,15 @@ import {
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-import { BubbleLogo } from "@/components/brand/bubble-logo";
+import { BrainLogo } from "@/components/brand/brain-logo";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { cn } from "@/lib/utils";
 
 const LINKS = [
   { href: "/admin", label: "Overview", icon: LayoutDashboard, exact: true },
   { href: "/admin/users", label: "Users", icon: Users },
   { href: "/admin/games", label: "Games", icon: Gamepad2 },
+  { href: "/admin/arena", label: "Arena", icon: Swords },
   { href: "/admin/schedule", label: "Word schedule", icon: CalendarClock },
   { href: "/admin/words", label: "Word lists", icon: Library },
   { href: "/admin/analytics", label: "Analytics", icon: BarChart3 },
@@ -33,12 +36,12 @@ export function AdminSidebar({ adminName }: { adminName: string }) {
     <aside className="lg:w-64 lg:shrink-0">
       <div className="glass sticky top-4 rounded-2xl p-3">
         <div className="flex items-center gap-2 px-3 py-2">
-          <span className="bubble-badge grid size-8 place-items-center rounded-lg">
-            <BubbleLogo className="size-5" />
+          <span className="brand-badge grid size-8 place-items-center rounded-lg">
+            <BrainLogo className="size-5" />
           </span>
           <div className="min-w-0">
             <p className="truncate text-xs font-semibold tracking-wide text-muted uppercase">
-              Bubble Wordle
+              Wordle Arena
             </p>
             <p className="truncate text-sm font-semibold">{adminName}</p>
           </div>
@@ -69,7 +72,7 @@ export function AdminSidebar({ adminName }: { adminName: string }) {
           })}
         </nav>
 
-        <div className="mt-2 border-t border-white/10 pt-2">
+        <div className="mt-2 flex items-center justify-between gap-2 border-t border-white/10 pt-2">
           <Link
             href="/"
             className="inline-flex items-center gap-2 rounded-xl px-3 py-2 text-sm font-medium text-muted transition hover:text-foreground"
@@ -77,6 +80,7 @@ export function AdminSidebar({ adminName }: { adminName: string }) {
             <ExternalLink className="size-4" />
             Back to site
           </Link>
+          <ThemeToggle />
         </div>
       </div>
     </aside>

@@ -1,10 +1,12 @@
-import { LayoutDashboard, LogOut } from "lucide-react";
+import { LayoutDashboard, LogOut, Swords } from "lucide-react";
 import Link from "next/link";
 
-import { BubbleLogo } from "@/components/brand/bubble-logo";
+import { BrainLogo } from "@/components/brand/brain-logo";
+import { Avatar } from "@/components/avatar/avatar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { logoutAction } from "@/lib/auth/actions";
 import { getCurrentUser } from "@/lib/auth/dal";
+import { normalizeAvatar } from "@/lib/avatar/config";
 
 export async function SiteHeader() {
   const user = await getCurrentUser();
@@ -14,14 +16,14 @@ export async function SiteHeader() {
       <div className="glass flex items-center justify-between gap-3 rounded-2xl px-3 py-2.5 sm:px-4">
         <Link
           href="/"
-          aria-label="Bubble Wordle home"
+          aria-label="Wordle Arena home"
           className="group flex items-center gap-2 font-semibold tracking-tight"
         >
-          <span className="bubble-badge grid size-9 place-items-center rounded-xl transition duration-300 group-hover:scale-105">
-            <BubbleLogo className="size-6" />
+          <span className="brand-badge grid size-9 place-items-center rounded-xl transition duration-300 group-hover:scale-105">
+            <BrainLogo className="size-6" />
           </span>
           <span className="text-sm whitespace-nowrap sm:text-lg">
-            Bubble <span className="text-primary">Wordle</span>
+            Wordle <span className="text-primary">Arena</span>
           </span>
         </Link>
 
@@ -32,6 +34,15 @@ export async function SiteHeader() {
             className="hidden rounded-xl px-3 py-2 text-sm font-medium text-muted transition hover:text-foreground sm:inline-flex"
           >
             Games
+          </Link>
+
+          <Link
+            href="/arena"
+            data-testid="nav-arena"
+            className="btn-primary hidden items-center gap-1.5 rounded-xl px-3.5 py-2 text-sm font-semibold whitespace-nowrap sm:inline-flex"
+          >
+            <Swords className="size-4" />
+            Play Arena
           </Link>
 
           {user?.role === "ADMIN" ? (
@@ -49,12 +60,19 @@ export async function SiteHeader() {
 
           {user ? (
             <div className="flex items-center gap-2">
-              <span
-                data-testid="header-user"
-                className="hidden max-w-40 truncate text-sm font-medium sm:inline"
+              <Link
+                href="/profile"
+                data-testid="header-profile-link"
+                className="flex items-center gap-2 rounded-xl px-1.5 py-1 transition hover:bg-white/10"
               >
-                {user.name ?? user.email}
-              </span>
+                <Avatar config={normalizeAvatar(user.avatarConfig)} className="size-7" />
+                <span
+                  data-testid="header-user"
+                  className="hidden max-w-32 truncate text-sm font-medium sm:inline"
+                >
+                  {user.name ?? user.username}
+                </span>
+              </Link>
               <form action={logoutAction}>
                 <button
                   type="submit"

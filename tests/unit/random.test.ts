@@ -24,7 +24,7 @@ describe("hashSeed", () => {
   });
 
   it("returns an unsigned 32-bit integer", () => {
-    const value = hashSeed("bubble-wordle");
+    const value = hashSeed("wordle-arena");
     expect(Number.isInteger(value)).toBe(true);
     expect(value).toBeGreaterThanOrEqual(0);
     expect(value).toBeLessThanOrEqual(0xffffffff);

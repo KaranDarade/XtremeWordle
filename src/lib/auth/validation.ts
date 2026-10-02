@@ -10,6 +10,13 @@ const email = z
   .refine((value) => EMAIL_PATTERN.test(value), { message: "Enter a valid email address." })
   .transform((value) => value.toLowerCase());
 
+export const passwordSchema = z
+  .string()
+  .min(8, { message: "Password must be at least 8 characters." })
+  .max(72, { message: "Password must be 72 characters or fewer." })
+  .regex(/[A-Za-z]/, { message: "Password must contain at least one letter." })
+  .regex(/[0-9]/, { message: "Password must contain at least one number." });
+
 export const signupSchema = z.object({
   name: z
     .string()
@@ -17,12 +24,24 @@ export const signupSchema = z.object({
     .min(2, { message: "Name must be at least 2 characters." })
     .max(60, { message: "Name must be 60 characters or fewer." }),
   email,
-  password: z
+  password: passwordSchema,
+});
+
+export const resetPasswordSchema = z
+  .object({
+    password: passwordSchema,
+    confirm: z.string(),
+  })
+  .refine((value) => value.password === value.confirm, {
+    message: "Passwords do not match.",
+    path: ["confirm"],
+  });
+
+export const otpSchema = z.object({
+  otp: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters." })
-    .max(72, { message: "Password must be 72 characters or fewer." })
-    .regex(/[A-Za-z]/, { message: "Password must contain at least one letter." })
-    .regex(/[0-9]/, { message: "Password must contain at least one number." }),
+    .trim()
+    .regex(/^\d{6}$/, { message: "Enter the 6-digit code." }),
 });
 
 export const loginSchema = z.object({

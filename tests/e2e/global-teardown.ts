@@ -27,9 +27,16 @@ export default async function globalTeardown() {
     );
     const removedUsers = await client.query(`DELETE FROM "User" WHERE email LIKE '%@example.com'`);
 
+    // Keep the other high-churn tables tidy too.
+    const removedOtps = await client.query(
+      `DELETE FROM "PasswordResetOtp" WHERE email LIKE '%@example.com'`,
+    );
+    await client.query(`DELETE FROM "Presence" WHERE "lastSeenAt" < now() - interval '1 day'`);
+    await client.query(`DELETE FROM "ArenaQueue" WHERE "joinedAt" < now() - interval '1 day'`);
+
     if (removedUsers.rowCount) {
       console.log(
-        `[e2e] removed ${removedUsers.rowCount} test account(s) and ${removedResults.rowCount ?? 0} result(s)`,
+        `[e2e] removed ${removedUsers.rowCount} test account(s), ${removedResults.rowCount ?? 0} result(s), ${removedOtps.rowCount ?? 0} reset code(s)`,
       );
     }
   } catch (error) {

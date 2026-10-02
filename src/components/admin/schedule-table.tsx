@@ -14,7 +14,7 @@ export function ScheduleTable({ gameSlug, rows }: { gameSlug: string; rows: Sche
 
   return (
     <div className="space-y-3">
-      <Notice status={state.status} message={state.message} />
+      <Notice status={state.status} message={state.message} testId="schedule-row-notice" />
 
       <div className="overflow-x-auto">
         <table className="w-full min-w-[640px] text-sm">
@@ -61,6 +61,7 @@ export function ScheduleTable({ gameSlug, rows }: { gameSlug: string; rows: Sche
                       type="submit"
                       name="force"
                       value="false"
+                      data-testid={`regenerate-${row.bucketKey}`}
                       disabled={pending}
                       className="glass rounded-lg px-2.5 py-1.5 text-xs font-medium transition hover:opacity-80 disabled:opacity-50"
                     >

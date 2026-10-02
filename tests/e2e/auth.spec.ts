@@ -115,4 +115,13 @@ test.describe("auth", () => {
     await expect(page.getByTestId("auth-error")).toContainText("Incorrect email or password");
     await expect(page).toHaveURL(/\/login/);
   });
+
+  test("hides Google sign-in when it is not configured", async ({ page, request }) => {
+    await page.goto("/login");
+    await expect(page.getByTestId("google-signin")).toHaveCount(0);
+
+    // The start endpoint reports that the deployment has no Google credentials.
+    const response = await request.get("/api/auth/google/start", { maxRedirects: 0 });
+    expect(response.status()).toBe(503);
+  });
 });

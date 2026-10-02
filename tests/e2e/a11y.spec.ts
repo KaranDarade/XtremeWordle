@@ -14,6 +14,8 @@ test.use({ reducedMotion: "reduce" });
 
 const PAGES: { name: string; path: string }[] = [
   { name: "landing", path: "/" },
+  { name: "arena", path: "/arena" },
+  { name: "leaderboard", path: "/leaderboard" },
   { name: "games hub", path: "/games" },
   { name: "wordle", path: "/games/wordle" },
   { name: "spelling bee", path: "/games/spelling-bee" },
@@ -29,6 +31,7 @@ const ADMIN_PAGES = [
   "/admin",
   "/admin/users",
   "/admin/games",
+  "/admin/arena",
   "/admin/schedule",
   "/admin/words",
   "/admin/analytics",

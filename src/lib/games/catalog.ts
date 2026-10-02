@@ -65,7 +65,7 @@ export const GAME_CATALOG: GameDefinition[] = [
 ];
 
 export const DEMO_USERS = [
-  { email: "user@demo.local", name: "Demo User", password: "Demo@12345" },
-  { email: "ayaan@demo.local", name: "Ayaan Khan", password: "Demo@12345" },
-  { email: "priya@demo.local", name: "Priya Sharma", password: "Demo@12345" },
+  { email: "user@demo.local", username: "demo", name: "Demo User", password: "Demo@12345" },
+  { email: "ayaan@demo.local", username: "ayaan", name: "Ayaan Khan", password: "Demo@12345" },
+  { email: "priya@demo.local", username: "priya", name: "Priya Sharma", password: "Demo@12345" },
 ];

@@ -44,6 +44,8 @@ function report(issues: RuntimeIssue[]): string {
 
 const PUBLIC_ROUTES = [
   "/",
+  "/arena",
+  "/leaderboard",
   "/games",
   "/games/wordle",
   "/games/spelling-bee",
@@ -58,6 +60,7 @@ const ADMIN_ROUTES = [
   "/admin",
   "/admin/users",
   "/admin/games",
+  "/admin/arena",
   "/admin/schedule",
   "/admin/words",
   "/admin/analytics",
@@ -91,7 +94,7 @@ test("the games hub and each board render as expected", async ({ page }) => {
   const issues = watchRuntime(page);
 
   await page.goto("/games");
-  await expect(page.locator('[data-testid^="game-card-"]')).toHaveCount(3);
+  await expect(page.locator('[data-testid^="game-card-"]')).toHaveCount(4);
 
   for (const game of ["wordle", "spelling-bee", "connections"]) {
     await page.getByTestId(`game-card-${game}`).click();

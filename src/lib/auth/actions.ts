@@ -4,19 +4,18 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { prisma } from "@/lib/db";
+import { safePath } from "@/lib/http/safe-path";
 import { migrateGuestToUser } from "@/lib/session/guest";
 
 import { hashPassword, verifyPassword } from "./password";
 import { createSession, destroySession } from "./session";
 import { authThrottle } from "./throttle";
+import { pickAvailableUsername } from "./username";
 import { flattenFieldErrors, loginSchema, signupSchema, type AuthFormState } from "./validation";
 
 /** Only allow same-origin, absolute-path redirects. */
-function safeRedirectTarget(value: FormDataEntryValue | null): string {
-  if (typeof value !== "string") return "/";
-  if (!value.startsWith("/") || value.startsWith("//")) return "/";
-  return value;
-}
+const safeRedirectTarget = (value: FormDataEntryValue | null): string =>
+  safePath(typeof value === "string" ? value : null);
 
 export async function signupAction(
   _prevState: AuthFormState,
@@ -66,6 +65,7 @@ export async function signupAction(
   const user = await prisma.user.create({
     data: {
       email: parsed.data.email,
+      username: await pickAvailableUsername(parsed.data.email, parsed.data.name),
       name: parsed.data.name,
       passwordHash: await hashPassword(parsed.data.password),
     },
@@ -116,6 +116,13 @@ export async function loginAction(
   };
 
   if (!user) return invalid;
+  if (!user.passwordHash) {
+    return {
+      status: "error",
+      message: "This account uses Google sign-in. Continue with Google instead.",
+      values,
+    };
+  }
 
   const passwordMatches = await verifyPassword(parsed.data.password, user.passwordHash);
   if (!passwordMatches) return invalid;

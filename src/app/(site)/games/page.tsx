@@ -1,12 +1,13 @@
 import type { Metadata } from "next";
 
+import { ArenaCard } from "@/components/games/arena-card";
 import { GameCard } from "@/components/games/game-card";
 import { getPublicGames } from "@/lib/games/public";
 
 export const metadata: Metadata = {
   title: "All games",
   description:
-    "Browse every game on Bubble Wordle — daily word puzzles, unlimited modes and more. Free to play, no account required.",
+    "Browse every game on Wordle Arena — daily word puzzles, unlimited modes and more. Free to play, no account required.",
 };
 
 export default async function GamesPage() {
@@ -23,8 +24,9 @@ export default async function GamesPage() {
       </header>
 
       <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <ArenaCard index={0} />
         {games.map((game, index) => (
-          <GameCard key={game.id} game={game} index={index} />
+          <GameCard key={game.id} game={game} index={index + 1} />
         ))}
       </div>
 

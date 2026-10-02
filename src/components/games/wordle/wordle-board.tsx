@@ -202,6 +202,14 @@ export function WordleBoard({
             {value === "DAILY" ? "Daily" : "Unlimited"}
           </button>
         ))}
+        <Link
+          href="/arena"
+          data-testid="wordle-mode-arena"
+          className="inline-flex items-center gap-1.5 rounded-xl bg-primary/15 px-4 py-2 text-sm font-semibold text-primary transition hover:bg-primary/25"
+        >
+          <span className="live-dot size-1.5 rounded-full bg-primary" />
+          Arena
+        </Link>
       </div>
 
       <p className="text-xs text-muted" data-testid="wordle-attempts">

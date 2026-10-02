@@ -17,12 +17,20 @@ export function TextArea({ className, ...props }: ComponentProps<"textarea">) {
   return <textarea className={cn(base, "min-h-24 resize-y", className)} {...props} />;
 }
 
-export function Notice({ status, message }: { status: string; message?: string }) {
+export function Notice({
+  status,
+  message,
+  testId = "form-notice",
+}: {
+  status: string;
+  message?: string;
+  testId?: string;
+}) {
   if (!message || status === "idle") return null;
   return (
     <p
       role="status"
-      data-testid="admin-notice"
+      data-testid={testId}
       className={cn(
         "rounded-xl border px-3 py-2 text-sm font-medium",
         status === "success"

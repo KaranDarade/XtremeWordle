@@ -54,3 +54,8 @@ next-env.d.ts
 .eslintcache
 
 /src/generated/prisma
+
+# local mail outbox (test mailer)
+.mail-outbox.log
+.vercel
+.env*

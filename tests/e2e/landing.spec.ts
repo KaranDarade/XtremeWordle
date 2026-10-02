@@ -1,10 +1,16 @@
 import { expect, test } from "@playwright/test";
 
 test.describe("landing page", () => {
-  test("leads with the games", async ({ page }) => {
+  test("spotlights the arena and then lists the games", async ({ page }) => {
     await page.goto("/");
 
-    // The playable games must be the first meaningful content, not buried.
+    // The arena band is the headline act, above the catalogue.
+    const band = page.getByTestId("arena-band");
+    await expect(band).toBeVisible();
+    await expect(page.getByTestId("arena-band-play")).toBeVisible();
+    await expect(page.getByTestId("arena-band-online-total")).toBeVisible();
+
+    const bandTop = await band.boundingBox().then((box) => box?.y ?? 9999);
     const cards = page.locator('[data-testid^="game-card-"]');
     await expect(cards).toHaveCount(3);
 
@@ -12,7 +18,7 @@ test.describe("landing page", () => {
       .first()
       .boundingBox()
       .then((box) => box?.y ?? 9999);
-    expect(firstCardTop).toBeLessThan(700);
+    expect(bandTop).toBeLessThan(firstCardTop);
   });
 
   test("fits horizontally with no overflow at any width", async ({ page }) => {
@@ -45,7 +51,7 @@ test.describe("landing page", () => {
   test("games index lists every published game", async ({ page }) => {
     await page.goto("/games");
     await expect(page.getByRole("heading", { name: "All games", level: 1 })).toBeVisible();
-    await expect(page.locator('[data-testid^="game-card-"]')).toHaveCount(3);
+    await expect(page.locator('[data-testid^="game-card-"]')).toHaveCount(4);
   });
 
   test("header navigation reaches the games hub", async ({ page }) => {
@@ -70,10 +76,10 @@ test.describe("landing page", () => {
     await expect(contact).toHaveAttribute("href", "mailto:daradekaran123@gmail.com");
   });
 
-  test("the decorative bubble field is hidden from assistive tech", async ({ page }) => {
+  test("the decorative neural field is hidden from assistive tech", async ({ page }) => {
     await page.goto("/");
 
-    const field = page.locator(".bubble-field");
+    const field = page.locator(".neural-field");
     await expect(field).toHaveCount(1);
     await expect(field).toHaveAttribute("aria-hidden", "true");
   });

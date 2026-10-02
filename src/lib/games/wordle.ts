@@ -41,7 +41,7 @@ function toView(result: GameResult, wordLength: number, maxAttempts: number): Wo
     solved: result.solved,
     completed,
     answer: completed ? result.answer : null,
-    title: mode === "DAILY" ? `Bubble Wordle #${result.bucketKey}` : "Bubble Wordle Unlimited",
+    title: mode === "DAILY" ? `Wordle Arena #${result.bucketKey}` : "Wordle Arena Unlimited",
   };
 }
 

@@ -119,7 +119,12 @@ describe("rotateAllGames", () => {
 
   it("never overwrites a manual override", async () => {
     const admin = await prisma.user.create({
-      data: { email: `rotation-admin-${Date.now()}@example.com`, passwordHash: "x", role: "ADMIN" },
+      data: {
+        email: `rotation-admin-${Date.now()}@example.com`,
+        username: `rot-admin-${Date.now().toString(36)}`,
+        passwordHash: "x",
+        role: "ADMIN",
+      },
     });
 
     const tomorrow = bucketKeyForMode("daily", new Date(Date.now() + 86_400_000));

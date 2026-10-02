@@ -33,18 +33,72 @@ enum ConsentType {
   MARKETING
 }
 
+// ------------------------------- Arena -------------------------------
+
+enum League {
+  BRONZE
+  SILVER
+  GOLD
+  PLATINUM
+  DIAMOND
+}
+
+enum ArenaMode {
+  DUEL
+  TRIO
+}
+
+enum ArenaMatchStatus {
+  PLAYING
+  FINISHED
+  ABANDONED
+}
+
+enum ArenaQueueStatus {
+  WAITING
+  MATCHED
+  CANCELLED
+}
+
+enum MatchResult {
+  WIN
+  LOSS
+  DRAW
+}
+
+enum PresenceStatus {
+  BROWSING
+  IN_MATCH
+}
+
 // ------------------------------- Auth -------------------------------
 
 model User {
-  id           String    @id @default(cuid())
-  email        String    @unique
-  passwordHash String
-  name         String?
-  role         Role      @default(USER)
-  isBanned     Boolean   @default(false)
-  createdAt    DateTime  @default(now())
-  updatedAt    DateTime  @updatedAt
-  lastLoginAt  DateTime?
+  id               String    @id @default(cuid())
+  email            String    @unique
+  username         String
+  passwordHash     String?
+  name             String?
+  role             Role      @default(USER)
+  isBanned         Boolean   @default(false)
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+  lastLoginAt      DateTime?
+  passwordUpdatedAt DateTime?
+
+  // OAuth
+  googleId String? @unique
+
+  // Arena profile
+  avatarConfig Json?
+  rankPoints   Int    @default(0)
+  league       League @default(BRONZE)
+  wins         Int    @default(0)
+  losses       Int    @default(0)
+  draws        Int    @default(0)
+  matchesPlayed Int   @default(0)
+  currentStreak Int   @default(0)
+  bestStreak    Int   @default(0)
 
   sessions    Session[]
   gameResults GameResult[]
@@ -52,9 +106,14 @@ model User {
   createdWords     DailyPuzzle[]  @relation("CreatedWords")
   createdRotations PoolRotation[] @relation("CreatedRotations")
   consents    ConsentRecord[]
+  arenaPlayers ArenaPlayer[]
+  arenaQueue   ArenaQueue[]
+  presence     Presence[]
 
+  @@unique([username])
   @@index([role])
   @@index([createdAt])
+  @@index([rankPoints])
 }
 
 model Session {
@@ -84,6 +143,9 @@ model GuestSession {
 
   gameResults GameResult[]
   consents    ConsentRecord[]
+  arenaPlayers ArenaPlayer[]
+  arenaQueue   ArenaQueue[]
+  presence     Presence[]
 
   @@index([createdAt])
 }
@@ -109,6 +171,7 @@ model Game {
   dailyPuzzles DailyPuzzle[]
   rotations    PoolRotation[]
   gameResults  GameResult[]
+  arenaMatches ArenaMatch[]
 
   @@index([isActive, sortOrder])
 }
@@ -255,4 +318,158 @@ model SiteSetting {
   value     Json
   updatedAt DateTime @updatedAt
   updatedBy String?
+}
+
+// ------------------------------- Arena -------------------------------
+
+/**
+ * One live or finished 1v1 duel. Round timing is derived from `startedAt` so no
+ * background worker is needed — see `src/lib/arena/clock.ts`.
+ */
+model ArenaMatch {
+  id              String           @id @default(cuid())
+  mode            ArenaMode        @default(DUEL)
+  status          ArenaMatchStatus @default(PLAYING)
+  gameId          String
+  word            String
+  roundCount      Int              @default(6)
+  roundMs         Int              @default(12000)
+  breakMs         Int              @default(5000)
+  countdownMs     Int              @default(3000)
+  startedAt       DateTime         @default(now())
+  finishedAt      DateTime?
+  winnerPlayerId  String?
+  isDraw          Boolean          @default(false)
+  /** True when any participant is a guest or bot: excluded from rank points. */
+  isCasual        Boolean          @default(false)
+  endReason       String?
+  version         Int              @default(1)
+  rematchOfId     String?
+  createdAt       DateTime         @default(now())
+
+  game      Game            @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  players   ArenaPlayer[]
+  guesses   ArenaGuess[]
+  reactions ArenaReaction[]
+
+  @@index([status, startedAt])
+  @@index([createdAt])
+}
+
+model ArenaPlayer {
+  id           String       @id @default(cuid())
+  matchId      String
+  slot         Int
+  userId       String?
+  guestId      String?
+  isBot        Boolean      @default(false)
+  displayName  String
+  username     String?
+  /** Deterministic avatar seed for guests and bots. */
+  avatarSeed   String?
+  league       League       @default(BRONZE)
+  pointsBefore Int          @default(0)
+  pointsAfter  Int          @default(0)
+  pointsDelta  Int          @default(0)
+  result       MatchResult?
+  solvedRound  Int?
+  solvedAt     DateTime?
+  bestGreens   Int          @default(0)
+  bestYellows  Int          @default(0)
+  bestAt       DateTime?
+  lastSeenAt   DateTime     @default(now())
+  joinedAt     DateTime     @default(now())
+
+  match   ArenaMatch  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  user    User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+  guest   GuestSession? @relation(fields: [guestId], references: [id], onDelete: SetNull)
+  guesses ArenaGuess[]
+
+  @@unique([matchId, slot])
+  @@index([matchId])
+  @@index([userId])
+  @@index([guestId])
+}
+
+/** Exactly one locked guess per player per round. */
+model ArenaGuess {
+  id         String   @id @default(cuid())
+  matchId    String
+  playerId   String
+  round      Int
+  guess      String
+  feedback   Json     @default("[]")
+  correct    Boolean  @default(false)
+  receivedAt DateTime @default(now())
+
+  match  ArenaMatch  @relation(fields: [matchId], references: [id], onDelete: Cascade)
+  player ArenaPlayer @relation(fields: [playerId], references: [id], onDelete: Cascade)
+
+  @@unique([playerId, round])
+  @@index([matchId, round])
+}
+
+model ArenaReaction {
+  id        String   @id @default(cuid())
+  matchId   String
+  playerId  String
+  emoji     String
+  createdAt DateTime @default(now())
+
+  match ArenaMatch @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@index([matchId, createdAt])
+}
+
+model ArenaQueue {
+  id          String            @id @default(cuid())
+  userId      String?
+  guestId     String?
+  displayName String
+  username    String?
+  avatarSeed  String?
+  league      League            @default(BRONZE)
+  status      ArenaQueueStatus  @default(WAITING)
+  matchId     String?
+  joinedAt    DateTime          @default(now())
+  lastSeenAt  DateTime          @default(now())
+
+  user  User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guest GuestSession? @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@index([status, joinedAt])
+  @@index([userId])
+  @@index([guestId])
+}
+
+/** Hashed, single-use password reset codes. */
+model PasswordResetOtp {
+  id         String    @id @default(cuid())
+  email      String
+  otpHash    String
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  consumedAt DateTime?
+  requestIp  String?
+  createdAt  DateTime  @default(now())
+
+  @@index([email, createdAt])
+  @@index([expiresAt])
+}
+
+/** Lightweight heartbeat used to render the "N online" counter. */
+model Presence {
+  id         String         @id @default(cuid())
+  key        String         @unique
+  userId     String?
+  guestId    String?
+  status     PresenceStatus @default(BROWSING)
+  lastSeenAt DateTime       @default(now())
+  createdAt  DateTime       @default(now())
+
+  user  User?         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  guest GuestSession? @relation(fields: [guestId], references: [id], onDelete: Cascade)
+
+  @@index([lastSeenAt])
+  @@index([status])
 }

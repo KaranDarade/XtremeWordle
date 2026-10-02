@@ -11,9 +11,13 @@ import { hashToken } from "./tokens";
 export interface CurrentUser {
   id: string;
   email: string;
+  username: string;
   name: string | null;
   role: "USER" | "ADMIN";
   createdAt: Date;
+  avatarConfig: unknown;
+  league: string;
+  rankPoints: number;
 }
 
 /**
@@ -34,8 +38,9 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
   if (!session || session.revokedAt || session.expiresAt.getTime() < Date.now()) return null;
   if (session.user.isBanned) return null;
 
-  const { id, email, name, role, createdAt } = session.user;
-  return { id, email, name, role, createdAt };
+  const { id, email, username, name, role, createdAt, avatarConfig, league, rankPoints } =
+    session.user;
+  return { id, email, username, name, role, createdAt, avatarConfig, league, rankPoints };
 });
 
 export async function requireUser(): Promise<CurrentUser> {
