@@ -123,6 +123,10 @@ A/AA), custom app icons, rate limiting, and security headers.
 | ----------------------------------------------------------- | ----------------------------------------------- |
 | ![Forgot password](docs/screenshots/07-forgot-password.png) | ![Not found](docs/screenshots/08-not-found.png) |
 
+| Admin dashboard                                             | Profile                                     |
+| ----------------------------------------------------------- | ------------------------------------------- |
+| ![Admin dashboard](docs/screenshots/09-admin-dashboard.png) | ![Profile](docs/screenshots/10-profile.png) |
+
 ## Tech stack
 
 | Layer     | Choice                                                            | Why                                                                             |
@@ -588,6 +592,10 @@ The project was built in phases, each verified (`npm run verify`) before moving 
 - More Connections puzzles and richer Bee letter sets.
 - Optional spectators and richer arena replay/animation.
 - Verified sending domain (best deliverability) and richer email templates.
+
+## License
+
+Released under the [MIT License](LICENSE). © 2026 Karan Darade.
 
 ---
 
