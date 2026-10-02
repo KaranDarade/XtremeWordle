@@ -1,13 +1,15 @@
 import { appendFile, mkdir } from "node:fs/promises";
 import path from "node:path";
 
+import nodemailer from "nodemailer";
+
 export interface MailMessage {
   to: string;
   subject: string;
   text: string;
 }
 
-export type MailProviderName = "console" | "file" | "resend";
+export type MailProviderName = "console" | "file" | "resend" | "smtp";
 
 export interface Mailer {
   name: MailProviderName;
@@ -89,9 +91,54 @@ const resendMailer: Mailer = {
   },
 };
 
+/**
+ * Generic SMTP delivery. With Gmail this works without owning a domain: create
+ * an App Password and send from your own address to any recipient.
+ *
+ *   MAIL_PROVIDER=smtp
+ *   SMTP_HOST=smtp.gmail.com  SMTP_PORT=465
+ *   SMTP_USER=you@gmail.com   SMTP_PASSWORD=<app password>
+ *   MAIL_FROM="Wordle Arena <you@gmail.com>"
+ */
+const smtpMailer: Mailer = {
+  name: "smtp",
+  async send(message) {
+    const host = process.env.SMTP_HOST?.trim();
+    const user = process.env.SMTP_USER?.trim();
+    const pass = process.env.SMTP_PASSWORD;
+    if (!host || !user || !pass) {
+      console.error("[mail] SMTP_HOST, SMTP_USER and SMTP_PASSWORD must all be set");
+      return false;
+    }
+
+    const port = Number(process.env.SMTP_PORT ?? 465);
+    const from = process.env.MAIL_FROM ?? user;
+
+    try {
+      const transport = nodemailer.createTransport({
+        host,
+        port,
+        secure: port === 465,
+        auth: { user, pass },
+      });
+      await transport.sendMail({
+        from,
+        to: message.to,
+        subject: message.subject,
+        text: message.text,
+      });
+      return true;
+    } catch (error) {
+      console.error("[mail] SMTP send failed", error);
+      return false;
+    }
+  },
+};
+
 export function mailProviderName(): MailProviderName {
   const configured = process.env.MAIL_PROVIDER?.trim().toLowerCase();
   if (configured === "resend") return "resend";
+  if (configured === "smtp") return "smtp";
   if (configured === "file") return "file";
   return "console";
 }
@@ -108,6 +155,8 @@ export function getMailer(): Mailer {
   switch (mailProviderName()) {
     case "resend":
       return resendMailer;
+    case "smtp":
+      return smtpMailer;
     case "file":
       return fileMailer;
     default:

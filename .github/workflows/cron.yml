@@ -1,0 +1,17 @@
+name: rotate-words
+
+on:
+  schedule:
+    # 12-hour word pools roll over at 00:00 and 12:00 IST (= 18:30 / 06:30 UTC).
+    - cron: "30 6,18 * * *"
+  workflow_dispatch:
+
+jobs:
+  rotate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Trigger word rotation
+        env:
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          curl -fsS -X POST "https://xtreme-wordle.vercel.app/api/cron/rotate-words?secret=${CRON_SECRET}"

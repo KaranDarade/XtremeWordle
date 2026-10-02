@@ -1,0 +1,49 @@
+name: uptime
+
+on:
+  schedule:
+    - cron: "*/30 * * * *"
+  workflow_dispatch:
+
+permissions:
+  issues: write
+
+jobs:
+  health:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check /api/health
+        run: |
+          code=$(curl -s -o /dev/null -w "%{http_code}" --max-time 20 https://xtreme-wordle.vercel.app/api/health)
+          echo "HTTP ${code}"
+          test "${code}" = "200"
+
+      - name: Open or update an issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = "Uptime check failing";
+            const body = `\`/api/health\` did not return 200 at ${new Date().toISOString()}.`;
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: "open",
+              labels: "uptime",
+            });
+            if (open.length > 0) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: open[0].number,
+                body,
+              });
+            } else {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title,
+                body,
+                labels: ["uptime"],
+              });
+            }
