@@ -2,6 +2,7 @@ import { createHmac } from "node:crypto";
 
 import type { Game, GamePuzzle, WordEntry } from "@/generated/prisma/client";
 import { prisma } from "@/lib/db";
+import { requiredSecret } from "@/lib/env";
 
 export interface GameSettings {
   resolver?: "word" | "puzzle";
@@ -36,7 +37,7 @@ export interface PuzzlePreview {
  * resolves to the same word, even if the scheduler never runs.
  */
 export async function deterministicIndex(gameId: string, bucketKey: string): Promise<number> {
-  const seed = process.env.SEED_SECRET ?? "extreme-wordle-dev-seed";
+  const seed = requiredSecret("SEED_SECRET", "extreme-wordle-dev-seed");
   const digest = createHmac("sha256", seed).update(`${gameId}:${bucketKey}`).digest();
   return digest.readUInt32BE(0);
 }

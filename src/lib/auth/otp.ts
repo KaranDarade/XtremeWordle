@@ -1,5 +1,7 @@
 import { createHmac, randomInt, timingSafeEqual } from "node:crypto";
 
+import { requiredSecret } from "@/lib/env";
+
 /** Numeric OTP lifetime and how many guesses a single code allows. */
 export const OTP_TTL_MS = 10 * 60 * 1000;
 export const OTP_MAX_ATTEMPTS = 5;
@@ -8,7 +10,7 @@ export const OTP_MAX_ATTEMPTS = 5;
 export const TICKET_TTL_MS = 10 * 60 * 1000;
 
 function secret(): string {
-  return process.env.SESSION_SECRET ?? "wordle-arena-dev-secret";
+  return requiredSecret("SESSION_SECRET", "wordle-arena-dev-secret");
 }
 
 /** Six digits, zero padded, uniformly random. */

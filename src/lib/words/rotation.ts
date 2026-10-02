@@ -1,6 +1,7 @@
 import { createHmac } from "node:crypto";
 
 import { prisma } from "@/lib/db";
+import { requiredSecret } from "@/lib/env";
 import { bucketKeyForMode, nextBucketKey, twelveHourBucketKey } from "@/lib/time/buckets";
 
 import { listAnswerWords, parseGameSettings, resolvePuzzle, type GameRef } from "./resolver";
@@ -16,7 +17,7 @@ export interface RotationSummary {
 
 /** Deterministic seed for a rotation window (used for reproducible pools). */
 export function rotationSeed(gameId: string, bucketKey: string): string {
-  const secret = process.env.SEED_SECRET ?? "extreme-wordle-dev-seed";
+  const secret = requiredSecret("SEED_SECRET", "extreme-wordle-dev-seed");
   return createHmac("sha256", secret)
     .update(`pool:${gameId}:${bucketKey}`)
     .digest("hex")
