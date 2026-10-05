@@ -1,7 +1,9 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import { Gamepad2, RotateCcw } from "lucide-react";
 import Link from "next/link";
+import { useEffect } from "react";
 
 export default function GlobalError({
   error,
@@ -10,6 +12,10 @@ export default function GlobalError({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  useEffect(() => {
+    Sentry.captureException(error);
+  }, [error]);
+
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center px-4 py-20 text-center">
       <div className="glass w-full rounded-3xl p-8">
