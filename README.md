@@ -129,20 +129,21 @@ A/AA), custom app icons, rate limiting, and security headers.
 
 ## Tech stack
 
-| Layer     | Choice                                                            | Why                                                                             |
-| --------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
-| Framework | **Next.js 16.3.8** (App Router, Turbopack, React 19)              | Server Components, Server Actions, Route Handlers and streaming in one runtime. |
-| Language  | **TypeScript 5** (strict)                                         | End-to-end type safety from Prisma to React.                                    |
-| Styling   | **Tailwind CSS v4** + design tokens in `globals.css`              | A single dark-wood "glass" system for light and dark.                           |
-| Database  | **PostgreSQL 18** (Neon)                                          | Managed, serverless-friendly, pooled connections.                               |
-| ORM       | **Prisma 7** + `@prisma/adapter-pg`                               | Typed client, migrations, driver adapter for `pg`.                              |
-| Auth      | Opaque sessions (SHA-256) + bcrypt + **Google OAuth 2.0 / PKCE**  | No third-party auth lock-in; safe server-side sessions.                         |
-| Captcha   | **Cloudflare Turnstile**                                          | Privacy-friendly, auto-bypassed in dev when unconfigured.                       |
-| Email     | **Resend** or **Gmail SMTP** (pluggable)                          | Works with or without an owned domain.                                          |
-| Realtime  | **Adaptive polling**                                              | No websockets/workers; serverless-friendly.                                     |
-| Tests     | **Vitest** + **Playwright** + **axe-core**                        | Logic/DB unit + integration, real-browser E2E and a11y.                         |
-| Quality   | ESLint 9, Prettier 3, `tsc --noEmit`                              | Enforced by `npm run verify`.                                                   |
-| Hosting   | **Vercel** (region `sin1`) + **Vercel Cron** + **GitHub Actions** | Zero-config deploys, scheduled jobs, uptime checks.                             |
+| Layer         | Choice                                                            | Why                                                                             |
+| ------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------- |
+| Framework     | **Next.js 16.3.8** (App Router, Turbopack, React 19)              | Server Components, Server Actions, Route Handlers and streaming in one runtime. |
+| Language      | **TypeScript 5** (strict)                                         | End-to-end type safety from Prisma to React.                                    |
+| Styling       | **Tailwind CSS v4** + design tokens in `globals.css`              | A single dark-wood "glass" system for light and dark.                           |
+| Database      | **PostgreSQL 18** (Neon)                                          | Managed, serverless-friendly, pooled connections.                               |
+| ORM           | **Prisma 7** + `@prisma/adapter-pg`                               | Typed client, migrations, driver adapter for `pg`.                              |
+| Auth          | Opaque sessions (SHA-256) + bcrypt + **Google OAuth 2.0 / PKCE**  | No third-party auth lock-in; safe server-side sessions.                         |
+| Captcha       | **Cloudflare Turnstile**                                          | Privacy-friendly, auto-bypassed in dev when unconfigured.                       |
+| Email         | **Resend** or **Gmail SMTP** (pluggable)                          | Works with or without an owned domain.                                          |
+| Realtime      | **Adaptive polling**                                              | No websockets/workers; serverless-friendly.                                     |
+| Tests         | **Vitest** + **Playwright** + **axe-core**                        | Logic/DB unit + integration, real-browser E2E and a11y.                         |
+| Quality       | ESLint 9, Prettier 3, `tsc --noEmit`                              | Enforced by `npm run verify`.                                                   |
+| Observability | **Sentry** (error tracking, DSN-guarded)                          | Client, server and edge error capture; inert until configured.                  |
+| Hosting       | **Vercel** (region `sin1`) + **Vercel Cron** + **GitHub Actions** | Zero-config deploys, scheduled jobs, uptime checks.                             |
 
 ## Architecture
 
@@ -550,6 +551,7 @@ to the static routes if the query fails).
 - **Health check:** `GET /api/health` returns `200` when the app can reach PostgreSQL, `503`
   otherwise.
 - **Auditing:** every admin mutation is written to the audit log.
+- **Error tracking:** Sentry captures client, server and edge errors (inert unless `SENTRY_DSN` is set).
 
 ## API reference
 
